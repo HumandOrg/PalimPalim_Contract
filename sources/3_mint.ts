@@ -18,6 +18,7 @@ dotenv.config();
 import { SampleJetton, storeMint, storeTokenTransfer } from "./output/SampleJetton_SampleJetton";
 import { getHttpV4Endpoint } from "@orbs-network/ton-access";
 // ========================================
+import { jettonParams } from "./constants/jettonData";
 
 let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fyAQoPMB"); // 🔴 Owner should usually be the deploying wallet's address.
 
@@ -26,7 +27,7 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
         // network: "testnet",
     });
     const client4 = new TonClient4({
-        endpoint: "https://mainnet-v4.tonhubapi.com",
+        endpoint,
     });
 
     let mnemonics = (process.env.MNEMONICS || "").toString(); // 🔴 Change to your own, by creating .env file!
@@ -39,12 +40,6 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
     });
 
     let wallet_contract = client4.open(wallet);
-    const jettonParams = {
-        name: "Test Token Jetton",
-        description: "This is description of Test Jetton Token in Tact-lang Syntax",
-        symbol: "TEST",
-        image: "https://syntax-tma.vercel.app/jetton.svg",
-    };
 
     // Create content Cell
     let content = buildOnchainMetadata(jettonParams);
@@ -57,7 +52,6 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
     let contract_dataFormat = SampleJetton.fromAddress(jetton_masterWallet);
     let contract = client4.open(contract_dataFormat);
     let jetton_wallet = await contract.getGetWalletAddress(wallet_contract.address);
-    console.log("✨ " + wallet_contract.address + "'s JettonWallet ==> ");
     // ✨Pack the forward message into a cell
     const test_message_left = beginCell()
         .storeBit(0) // 🔴  whether you want to store the forward payload in the same cell or not. 0 means no, 1 means yes.
@@ -68,7 +62,7 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
         .store(
             storeMint({
                 $$type: "Mint",
-                amount: toNano(200),
+                amount: toNano(100),
             })
         )
         .endCell();
@@ -79,13 +73,14 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
     // ========================================
     printSeparator();
     console.log("Current deployment wallet balance: ", fromNano(balance).toString(), "💎TON");
-    console.log("\n🛠️ Calling To JettonWallet:\n" + jetton_wallet + "\n");
+    // console.log("\n🛠️ Calling To JettonWallet:\n" + jetton_wallet + "\n");
+    console.log("\n🛠️ Calling To jetton_masterWallet:\n" + jetton_masterWallet + "\n");
     await wallet_contract.sendTransfer({
         seqno,
         secretKey,
         messages: [
             internal({
-                to: jetton_wallet,
+                to: jetton_masterWallet,
                 value: deployAmount,
                 init: {
                     code: init.code,

@@ -8,6 +8,7 @@ import { JettonDefaultWallet, TokenBurn } from "./output/SampleJetton_JettonDefa
 import { printSeparator } from "./utils/print";
 import * as dotenv from "dotenv";
 import { getHttpV4Endpoint } from "@orbs-network/ton-access";
+import { jettonParams } from "./constants/jettonData";
 dotenv.config();
 
 (async () => {
@@ -23,17 +24,7 @@ dotenv.config();
     let secretKey = keyPair.secretKey;
     let workchain = 0; // we are working in basechain.
     let deployer_wallet = WalletContractV4.create({ workchain, publicKey: keyPair.publicKey });
-    console.log(deployer_wallet.address);
-
     let deployer_wallet_contract = client4.open(deployer_wallet);
-
-    const jettonParams = {
-        name: "Syntax",
-        description: "Syntax jetton token",
-        symbol: "STX",
-        image: "https://syntax-tma.vercel.app/jettonIcon.svg",
-    };
-
     // Create content Cell
     let content = buildOnchainMetadata(jettonParams);
 
@@ -64,7 +55,7 @@ dotenv.config();
     let balance: bigint = await deployer_wallet_contract.getBalance();
 
     console.log("Current deployment wallet balance = ", fromNano(balance).toString(), "💎TON");
-    console.log("Minting:: ", fromNano(supply));
+    console.log("Minting: ", fromNano(supply));
     printSeparator();
 
     await deployer_wallet_contract.sendTransfer({
@@ -78,6 +69,7 @@ dotenv.config();
                     code: init.code,
                     data: init.data,
                 },
+                bounce: true,
                 body: packed_msg,
             }),
         ],

@@ -17,6 +17,7 @@ dotenv.config();
 // ========================================
 import { SampleJetton, storeTokenTransfer } from "./output/SampleJetton_SampleJetton";
 // ========================================
+import { jettonParams } from "./constants/jettonData";
 
 let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fyAQoPMB"); // 🔴 Owner should usually be the deploying wallet's address.
 
@@ -36,13 +37,6 @@ let NewOwner_Address = Address.parse("UQD6mORg_6kpV0rIS7XMGDBW0D3qWk2JtW5v8xH9fy
     });
 
     let wallet_contract = client4.open(wallet);
-    const jettonParams = {
-        name: "Test Token Jetton",
-        description: "This is description of Test Jetton Token in Tact-lang Syntax",
-        symbol: "TEST",
-        image: "https://syntax-tma.vercel.app/jetton.svg",
-    };
-
     // Create content Cell
     let content = buildOnchainMetadata(jettonParams);
 
